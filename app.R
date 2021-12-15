@@ -1,5 +1,6 @@
+install.packages("DT")
+
 library(shiny)
-library("RSQLite")
 library(tidyverse)
 library(ggplot2)
 library(DT)
