@@ -5,7 +5,8 @@ Madison Dunn, Sam Murray, Jim Tang, Jake Reiners
 Link to github: <https://github.com/madisondunn8/433-app>
 
 -   Note: run shiny app by putting **runGitHub(“433-app”,
-    “madisondunn8”,ref=“main”)** into RStudio.
+    “madisondunn8”,ref=“main”)** into RStudio. Be sure to call
+    library(shiny) first.
 
 -   Original data from: <https://www.kaggle.com/wyattowalsh/basketball>
     and

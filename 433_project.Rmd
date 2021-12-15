@@ -1,16 +1,27 @@
 ---
-title: "Figure One 433 Project"
+title: "NBA Draft Picks and Team Success - Stat 433"
 author: "Sam Murray, Madison Dunn, Jake Reiner,  Huailin Tang"
 date: "11/17/2021"
 output: html_document
 ---
 
-```{r, echo=FALSE}
+```{r echo = FALSE, message=FALSE, warning=FALSE}
 library("RSQLite")
 library(tidyverse)
+library("ggfortify")
+library(ggplot2)
+library("caret")
+library(shiny)
 ```
+Link to github: https://github.com/madisondunn8/433-app
 
-```{r, echo=FALSE}
+- Note: run shiny app by putting **runGitHub("433-app", "madisondunn8",ref="main")** into RStudio. Be sure to call library(shiny) first. 
+
+- Original data from: https://www.kaggle.com/wyattowalsh/basketball and https://www.kaggle.com/boonpalipatana/nba-season-records-from-every-year
+
+**For our project, we decided to investigate the relationship between draft picks and the NBA. The data used can be seen in a shiny app, titled "App.R". Our full written report is also in this repository.**
+
+```{r message=FALSE, warning=FALSE}
 con <- dbConnect(drv=RSQLite::SQLite(), dbname="basketball.sqlite")
 
 tables <- dbListTables(con)
@@ -28,23 +39,21 @@ combine_data = lDataFrames[[2]]
 season_data=lDataFrames[[3]]
 
 wins_data = read.csv("Team_Records.csv")
-wins_data
-draft_data
+colnames(wins_data)[1] = "Season"
 ```
 
 ```{r, inclue=FALSE}
 # combine draft data with team success data merging by team and year
 
 draft = draft_data %>% 
-  #filter(numberPickOverall <= 14) %>% 
   mutate(teamYear = paste(teamName, ", ", yearDraft, sep=""))
 
 wins_data = wins_data %>% 
   mutate(teamYear = paste(gsub("[^[:alnum:]]", "", word(Team,-1)), ", ", substr(Season, 1, 4), sep=""))
 
 draft_and_wins = merge(draft, wins_data, by.x = "teamYear", by.y = "teamYear")
-draft_and_wins
 ```
+
 
 ```{r, echo=FALSE}
 df1 = wins_data[1,]
@@ -86,7 +95,7 @@ draft_scores = draft_and_wins %>%
 ```
 
 ```{r, echo = FALSE}
-draft_scores
+head(draft_scores)
 ```
 
 ```{r, include=FALSE}
@@ -144,33 +153,27 @@ draft_scores_records = draft_scores_records %>% filter(avg_win_pct_change <= 200
 ```
 
 ```{r, echo=FALSE}
-draft_scores_records
+###############
+# Shiny app
+###############
+#runGitHub("433-app","madisondunn8", ref = "main")
 ```
 
 ```{r, echo=FALSE}
-#draft_scores_records %>% 
-  #filter(draft_score >= 80) %>%
-  #ggplot(aes(x = draft_score, y = win_pct_3_years_after)) + 
-  #geom_point()
+draft_scores_records %>% 
+  filter(draft_score >= 80) %>%
+  ggplot(aes(x = draft_score, y = avg_win_pct_change)) + 
+  geom_point()
 
 draft_scores_records %>% 
-  #filter(best_pick <= 3) %>%
-  ggplot(aes(x = draft_score, y = win_pct_change_3_years)) + 
-  geom_point()+
-  geom_smooth()+
-  ggtitle("Win % Five Years After Current Draft vs Draft Score in Current Draft")
-
-#draft_scores_records %>% 
-  #filter(best_pick <= 30) %>%
-  #ggplot(aes(x =  best_pick, y = win_pct_change_3_years)) + 
-  #geom_point()
+  filter(best_pick <= 3) %>%
+  ggplot(aes(x = draft_score, y = win_pct_5_years_after)) + 
+  geom_point()
 
 draft_scores_records %>% 
   #filter(best_pick <= 30) %>%
-  ggplot(aes(x =  best_pick, y = win_pct_change_3_years)) + 
-  geom_point()+
-  geom_smooth()+
-  ggtitle("Win % Five Years After Current Draft vs Best Pick in Current Draft")
+  ggplot(aes(x = draft_score- best_pick, y = win_pct_change_3_years )) + 
+  geom_point()
 ```
 
 
@@ -184,9 +187,10 @@ draft_scores_records %>%
 # all teams
 all <- lm(win_pct_change_3_years ~ draft_score + best_pick, data = draft_scores_records)
 plot(x=predict(all), y=draft_scores_records$win_pct_change_3_years)
-all$coefficients
+summary(all)
 ```
 
+- **Best pick is statistically significant here but draft score is not.**
 
 ```{r}
 # teams below 500
@@ -216,58 +220,16 @@ Figure One shows and NBA teams draft score in a given year versus the teams succ
 
 
 
+```{r}
+log_model = lm(win_pct_change_3_years ~ log(draft_score)+best_pick, data = draft_scores_records)
+
+summary(log_model)
+
+ggplot(draft_scores_records, aes(draft_score, win_pct_change_3_years)) +
+  geom_point() +
+  stat_smooth(method=lm,formula=y~log(x))
+```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- Draft score is statistically significant at a .10 level after taking a log transformation of the variable. 
 
