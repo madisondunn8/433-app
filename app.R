@@ -14,7 +14,6 @@ library(DT)
 
 
 
-
 draft_data=read.csv("draft_data.csv")
 season_data=read.csv("season_data.csv")
 combine_data=read.csv("combine_data.csv")
@@ -121,24 +120,27 @@ draft_scores_records = draft_scores_records %>% filter(win_pct_6_years_after <= 
 draft_scores_records = draft_scores_records %>% filter(win_pct_7_years_after <= 1.00)
 draft_scores_records = draft_scores_records %>% filter(avg_win_pct_change <= 200)
 
+
 ui <- fluidPage(
-  title = "NBA Draft Statistics",
-  titlePanel("NBA Draft and Wins Data"),
+  title = "Stat 433 - NBA Draft Statistics",
   sidebarLayout(
     sidebarPanel(
       conditionalPanel(
-        'input.dataset === "draft_scores_records"',
+        'input.dataset === "draft_and_wins"',
         checkboxGroupInput("show_vars", "Columns in draft_and_wins to show:",
-                           names(draft_scores_records), selected = names(draft_scores_records))
-        
+                           names(draft_and_wins), selected = names(draft_and_wins))
+      ),
+      conditionalPanel(
+        'input.dataset === "season_data"',
+        helpText("Click the column header to sort a column.")
       ),
       width = 2
     ),
     mainPanel(
       tabsetPanel(
         id = 'dataset',
-        tabPanel("draft_scores_records", DT::dataTableOutput("mytable1"))
-
+        tabPanel("draft_and_wins", DT::dataTableOutput("mytable1")),
+        tabPanel("season_data", DT::dataTableOutput("mytable2"))
       )
     )
   )
@@ -147,11 +149,16 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   # choose columns to display
-  draft_scores_records2 = draft_scores_records[sample(nrow(draft_scores_records), 535), ]
+  draft_and_wins2 = draft_and_wins[sample(nrow(draft_and_wins), 1000), ]
   output$mytable1 <- DT::renderDataTable({
-    DT::datatable(draft_scores_records2[, input$show_vars, drop = FALSE])
+    DT::datatable(draft_and_wins2[, input$show_vars, drop = FALSE])
   })
-
+  
+  # sorted columns are colored 
+  output$mytable2 <- DT::renderDataTable({
+    DT::datatable(season_data, options = list(orderClasses = TRUE))
+  })
+  
   
 }
 
