@@ -1,6 +1,10 @@
-install.packages("DT")
-install.packages("tidyverse")
-install.packages("ggplot2")
+packages <- c("shiny", "tidyverse", "ggplot2", "DT")
+
+# Install packages not yet installed
+installed_packages <- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {
+  install.packages(packages[!installed_packages])
+}
 
 library(shiny)
 library(tidyverse)
