@@ -4,10 +4,8 @@ Madison Dunn, Sam Murray, Jim Tang, Jake Reiners
 
 Link to github: <https://github.com/madisondunn8/433-app>
 
--   Note: you must download “basketball.sqlite” here for the shiny app
-    to work: <https://www.kaggle.com/wyattowalsh/basketball/download>,
-    then put the downloaded file into your working directory within
-    RStudio (dataset is too large to put on Github myself).
+-   Note: run shiny app by putting “runGitHub(”433-app”,
+    “madisondunn8”,ref=“main”)” into RStudio.
 
 **For our project, we decided to investigate the relationship between
 draft picks and the NBA. The data used can be seen in a shiny app,
