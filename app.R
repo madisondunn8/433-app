@@ -122,7 +122,8 @@ draft_scores_records = draft_scores_records %>% filter(avg_win_pct_change <= 200
 
 
 ui <- fluidPage(
-  title = "Stat 433 - NBA Draft Statistics",
+  title = "NBA Draft Statistics",
+  titlePanel("Stat 433 - NBA Draft Project"),
   sidebarLayout(
     sidebarPanel(
       conditionalPanel(
