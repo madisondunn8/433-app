@@ -4,21 +4,12 @@ library(tidyverse)
 library(ggplot2)
 library(DT)
 
-con <- dbConnect(drv=RSQLite::SQLite(), dbname="basketball.sqlite")
 
-tables <- dbListTables(con)
 
-tables <- tables[tables != "sqlite_sequence"]
 
-lDataFrames <- vector("list", length=length(tables))
-
-for (i in seq(along=tables)) {
-  lDataFrames[[i]] <- dbGetQuery(conn=con, statement=paste("SELECT * FROM '", tables[[i]], "'", sep=""))
-}
-draft_data = lDataFrames[[1]]
-combine_data = lDataFrames[[2]]
-season_data=lDataFrames[[3]]
-
+draft_data=read.csv("draft_data.csv")
+season_data=read.csv("season_data.csv")
+combine_data=read.csv("combine_data.csv")
 wins_data = read.csv("Team_Records.csv")
 colnames(wins_data)[1] = "Season"
 # combine draft data with team success data merging by team and year
