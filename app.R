@@ -15,7 +15,7 @@ library(DT)
 
 
 draft_data=read.csv("draft_data.csv")
-season_data=read.csv("season_data.csv")
+draft_scores_records=read.csv("draft_scores_records.csv")
 combine_data=read.csv("combine_data.csv")
 wins_data = read.csv("Team_Records.csv")
 colnames(wins_data)[1] = "Season"
@@ -131,16 +131,16 @@ ui <- fluidPage(
                            names(draft_and_wins), selected = names(draft_and_wins))
       ),
       conditionalPanel(
-        'input.dataset === "season_data"',
+        'input.dataset === "draft_scores_records"',
         helpText("Click the column header to sort a column.")
       ),
-      width = 2
+      width = 3
     ),
     mainPanel(
       tabsetPanel(
         id = 'dataset',
         tabPanel("draft_and_wins", DT::dataTableOutput("mytable1")),
-        tabPanel("season_data", DT::dataTableOutput("mytable2"))
+        tabPanel("draft_scores_records", DT::dataTableOutput("mytable2"))
       )
     )
   )
@@ -156,7 +156,7 @@ server <- function(input, output) {
   
   # sorted columns are colored 
   output$mytable2 <- DT::renderDataTable({
-    DT::datatable(season_data, options = list(orderClasses = TRUE))
+    DT::datatable(draft_scores_records, options = list(orderClasses = TRUE))
   })
   
   
