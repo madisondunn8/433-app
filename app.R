@@ -15,7 +15,7 @@ library(DT)
 
 
 draft_data=read.csv("draft_data.csv")
-season_data=read.csv("season_data.csv")
+wins_data=read.csv("wins_data.csv")
 combine_data=read.csv("combine_data.csv")
 wins_data = read.csv("Team_Records.csv")
 colnames(wins_data)[1] = "Season"
@@ -28,13 +28,13 @@ draft = draft_data %>%
 wins_data = wins_data %>% 
   mutate(teamYear = paste(gsub("[^[:alnum:]]", "", word(Team,-1)), ", ", substr(Season, 1, 4), sep=""))
 
-draft_and_wins = merge(draft, wins_data, by.x = "teamYear", by.y = "teamYear")
+draft_scores_records = merge(draft, wins_data, by.x = "teamYear", by.y = "teamYear")
 
 df1 = wins_data[1,]
 five_after_first = list()
 #rbind(df1, df2)
 index = 0
-for (i in draft_and_wins[draft_and_wins$numberPickOverall==1,]$teamYear){
+for (i in draft_scores_records[draft_scores_records$numberPickOverall==1,]$teamYear){
   team = strsplit(i, ', ')[[1]][1]
   year = as.numeric(strsplit(i, ', ')[[1]][2])
   
@@ -55,7 +55,7 @@ for (i in draft_and_wins[draft_and_wins$numberPickOverall==1,]$teamYear){
 }
 five_years_after_first_pick = df1 %>% distinct(teamYear, .keep_all = TRUE)
 
-draft_scores = draft_and_wins %>% 
+draft_scores = draft_scores_records %>% 
   filter(yearDraft>=1990) %>% 
   group_by(teamYear) %>% 
   summarize(pick_sum = sum(numberPickOverall), 
@@ -127,12 +127,12 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       conditionalPanel(
-        'input.dataset === "draft_and_wins"',
-        checkboxGroupInput("show_vars", "Columns in draft_and_wins to show:",
-                           names(draft_and_wins), selected = names(draft_and_wins))
+        'input.dataset === "draft_scores_records"',
+        checkboxGroupInput("show_vars", "Columns in draft_scores_records to show:",
+                           names(draft_scores_records), selected = names(draft_scores_records))
       ),
       conditionalPanel(
-        'input.dataset === "season_data"',
+        'input.dataset === "wins_data"',
         helpText("Click the column header to sort a column.")
       ),
       width = 3
@@ -140,8 +140,8 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(
         id = 'dataset',
-        tabPanel("draft_and_wins", DT::dataTableOutput("mytable1")),
-        tabPanel("season_data", DT::dataTableOutput("mytable2"))
+        tabPanel("draft_scores_records", DT::dataTableOutput("mytable1")),
+        tabPanel("wins_data", DT::dataTableOutput("mytable2"))
       )
     )
   )
@@ -150,14 +150,14 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   # choose columns to display
-  draft_and_wins2 = draft_and_wins[sample(nrow(draft_and_wins), 1000), ]
+  draft_scores_records2 = draft_scores_records[sample(nrow(draft_scores_records), 500), ]
   output$mytable1 <- DT::renderDataTable({
-    DT::datatable(draft_and_wins2[, input$show_vars, drop = FALSE])
+    DT::datatable(draft_scores_records2[, input$show_vars, drop = FALSE])
   })
   
   # sorted columns are colored 
   output$mytable2 <- DT::renderDataTable({
-    DT::datatable(season_data, options = list(orderClasses = TRUE))
+    DT::datatable(wins_data, options = list(orderClasses = TRUE))
   })
   
   
